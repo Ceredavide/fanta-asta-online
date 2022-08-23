@@ -8,13 +8,19 @@ const defaultUser = {
   name: 'Anonymous',
 };
 
-const messageExpirationTimeMS = 5*60 * 1000;
+const testUsers = {
+  "1": "davide",
+  "2": "giovanni"
+}
+
+const messageExpirationTimeMS = 5 * 60 * 1000;
 
 class Connection {
   constructor(io, socket) {
     this.socket = socket;
     this.io = io;
-    socket.on("conntection", () => console.log("pritha"))
+    socket.on("connection", (socket) => this.connect(socket))
+    socket.on("check-auth", (value) => this.checkAuth(value))
     socket.on('getMessages', () => this.getMessages());
     socket.on('message', (value) => this.handleMessage(value));
     socket.on('disconnect', () => this.disconnect());
@@ -22,11 +28,20 @@ class Connection {
       console.log(`connect_error due to ${err.message}`);
     });
   }
-  
+
+  checkAuth(userToken) {
+    // se il token è valido invia il nome dell utente
+    if (Object.keys(testUsers).includes(userToken)) {
+      this.io.sockets.emit("res-auth", testUsers[userToken])
+    } else {
+      this.io.sockets.emit("res-auth", null)
+    }
+  }
+
   sendMessage(message) {
     this.io.sockets.emit('message', message);
   }
-  
+
   getMessages() {
     messages.forEach((message) => this.sendMessage(message));
   }
@@ -51,15 +66,19 @@ class Connection {
     );
   }
 
+  connect(socket) {
+    console.log(minghie)
+    console.log(socket)
+  }
+
   disconnect() {
-    console.log("pritha")
     users.delete(this.socket);
   }
 }
 
 function chat(io) {
   io.on('connection', (socket) => {
-    new Connection(io, socket);   
+    new Connection(io, socket);
   });
 };
 
