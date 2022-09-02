@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
-import AuthInput from './AuthInput';
-import Messages from './Messages';
-import MessageInput from './MessageInput';
+import Asta from './components/asta';
+import Dashboard from './components/dashboard';
+import AuthInput from './components/AuthInput';
 
-import './App.css';
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -25,16 +24,13 @@ function App() {
     return (
       <div className="App">
         <header className="app-header">
-          React Chat
+          React Chat {user ? `${user.nome}` : ""}
         </header>
-        {socket ? user ? (
-          <div className="chat-container">
-            <Messages socket={socket} />
-            <MessageInput socket={socket} />
-          </div>
+        {user ? user.nome === "Admin" ? <Dashboard socket={socket} /> : (
+          <Asta socket={socket} user={user} setUser={setUser} />
         ) : (
           <AuthInput socket={socket} setUser={setUser} />
-        ) : <div>Loading</div>}
+        )}
       </div>
     );
   }
