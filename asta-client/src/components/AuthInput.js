@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './MessageInput.css';
 
 const AuthInput = ({ socket, setUser }) => {
 
@@ -14,8 +13,7 @@ const AuthInput = ({ socket, setUser }) => {
     useEffect(() => {
 
         const handleAuth = (value) => {
-            console.log(value)
-            if (value === null) {
+            if (value.nome === "") {
                 alert("valore inserito errato, riprovare.")
             } else {
                 alert("successo!")
