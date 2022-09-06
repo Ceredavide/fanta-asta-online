@@ -79,6 +79,10 @@ class Authentication {
         return Array.from(this.activeUsers.values())
     }
 
+    getUserList() {
+        return userList
+    }
+
     addUser(socketId, userName) {
         this.activeUsers.set(socketId, userName || "Admin")
     }
