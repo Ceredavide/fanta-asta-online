@@ -1,3 +1,5 @@
+const db = require("./Database")
+
 const userList = [
     {
         nome: "Simone",
@@ -46,12 +48,12 @@ class Authentication {
         this.activeUsers = new Map();
     }
 
-    checkAuth(sockets, userToken) {
+    checkAuth(sockets, socket, userToken) {
 
         if (userToken === "admin") {
             sockets.emit("res-auth", { nome: "Admin" })
             this.addUser()
-            this.changeActiveUsers(sockets)
+            this.sendActiveUsers(sockets)
             return
         }
         //pigliare info utente
@@ -61,23 +63,34 @@ class Authentication {
             db.getData(user.nome).then((data) => {
                 sockets.emit("res-auth", { ...data })
             })
-            this.addUser(this.socket.id, user.nome)
-            this.changeActiveUsers()
+            this.addUser(socket.id, user.nome)
+            this.sendActiveUsers(sockets)
         } else {
-            this.socket.emit("res-auth", null)
+            socket.emit("res-auth", null)
         }
+    }
+
+    getUser(socketId) {
+        const user = this.activeUsers.get(socketId)
+        return user
+    }
+
+    getAllUsers() {
+        return Array.from(this.activeUsers.values())
     }
 
     addUser(socketId, userName) {
         this.activeUsers.set(socketId, userName || "Admin")
     }
 
-    removeUser(socketId) {
+    removeUser(sockets, socketId) {
         this.activeUsers.delete(socketId)
+        this.sendActiveUsers(sockets)
     }
 
-    changeActiveUsers(sockets) {
-        sockets.emit("change-active-users", Array.from(activeUsers.values()))
+    sendActiveUsers(sockets) {
+        const users = this.getAllUsers()
+        sockets.emit("change-active-users", users)
     }
 }
 
