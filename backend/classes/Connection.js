@@ -1,6 +1,6 @@
 const db = require("./Database")
 
-const listone = require("./data/Quotazioni_Fantacalcio_Stagione_2022_23.json")
+const listone = require("../data/Quotazioni_Fantacalcio_Stagione_2022_23.json")
 
 const activeUsers = new Map();
 const settings = new Map();
