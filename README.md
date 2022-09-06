@@ -16,10 +16,11 @@ Facciaml
 [] Creazione logica conferma offerta più alta
 [] Creazione logica selezione giocatore x asta a turni
 [] Creazione logica conferma offerta più alta
-[] Creazione classi x ogni singola fuzione (p.es asta-stato, auth, ecc.)
 
 
 ### In Progress
+
+[] Creazione classi x ogni singola fuzione (p.es asta-stato, auth, ecc.)
 
 ### Done ✓
 
