@@ -29,12 +29,18 @@ class Connection {
       asta.selectGiocatore(this.io.sockets, giocatore)
     })
 
+    socket.on("leave-giocatore",() => {
+      const user = auth.getUser(this.socket.id)
+      asta.leaveGiocatore(this.io.sockets, user)
+    })
+
     socket.on("send-proposta", (value) => {
       const user = auth.getUser(this.socket.id)
       asta.sendProposta(this.io.sockets, user, value)
     })
 
     socket.on('disconnect', () => this.disconnect());
+    
     //   socket.on('connect_error', (err) => {
     //     console.log(`connect_error due to ${err.message}`);
     //   });
