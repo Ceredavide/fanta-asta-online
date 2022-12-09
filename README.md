@@ -12,13 +12,15 @@ Facciaml
 
 ## BACKEND
 
+[] Typescript?
 [] Creazione logica selezione giocatore x asta a turni
 [] Creazione logica conferma offerta più alta
 [] Creazione classe Error che invia errori al client
+[] Creazione logica termine asta x un giocatore e passaggio a nuova selezione
 
 ### In Progress
 
-[] Creazione logica termine asta x un giocatore e passaggio a nuova selezione
+[] Refactoring Pesante
 
 ### Done ✓
 
