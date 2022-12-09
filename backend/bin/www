@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var chat = require('../chat');
+var connection = require('../classes/Connection');
 var socketio = require('socket.io');
 
 var app = require('../app');
@@ -29,7 +29,7 @@ var io = socketio(server, {
     methods: ['GET', 'POST']
   }
 });
-chat(io);
+connection(io);
 
 /**
  * Listen on provided port, on all network interfaces.
