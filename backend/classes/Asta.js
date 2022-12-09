@@ -1,10 +1,9 @@
 const Authentication = require("./Authentication")
 
-const listone = require("../data/Quotazioni_Fantacalcio_Stagione_2022_23.json")
+const listone = require("../data/Quotazioni_Fantacalcio_Stagione_2022_23.json");
+const SoccerPlayer = require("./SoccerPlayer");
 
-const auth = new Authentication();
-
-const userList = auth.getUserList();
+const userList = new Authentication().getUserList();
 
 const categoriaGiocatoriList = [
     "Portieri",
@@ -16,11 +15,10 @@ const categoriaGiocatoriList = [
 class Asta {
     constructor() {
         this.isAstaOn = false;
-        this.listone = listone;
         this.categoriaGiocatori = categoriaGiocatoriList[0]
+        this.listone = listone[`${this.categoriaGiocatori}`];
         this.currentUser = 0;
-        this.giocatoreSelezionato = null;
-        this.proposte = []
+        this.giocatoreSelezionato = new SoccerPlayer();
     }
 
     getAstaStatus(sockets) {
@@ -31,20 +29,32 @@ class Asta {
         sockets.emit("update-asta-status", data)
     }
 
+    getSoccerPlayerStatus(sockets) {
+        if(this.giocatoreSelezionato){
+            sockets.emit('update-soccer-player-status', this.giocatoreSelezionato.getStatus())
+        }
+    }
+
     activeAsta(sockets) {
         this.isAstaOn = true;
         this.getAstaStatus(sockets)
     }
 
-    selectGiocatore(sockets, giocatore) {
-        this.giocatoreSelezionato = giocatore
+    selectGiocatore(sockets, giocatoreId) {
+        const selectedGiocatore = this.listone.find((giocatore) => giocatore.Id === giocatoreId)
+        this.giocatoreSelezionato = new SoccerPlayer(selectedGiocatore)
         this.getAstaStatus(sockets)
+        this.getSoccerPlayerStatus(sockets)
     }
 
-    sendProposta(sockets, user, value) {
-        const prevState = this.proposte;
-        this.proposte = [{ user, value, timestamp: Date.now() }, ...prevState]
-        this.getAstaStatus(sockets);
+    leaveGiocatore(sockets, user) {
+        const remainedUsers = this.giocatoreSelezionato.leaveGiocatore(user)
+        this.getSoccerPlayerStatus(sockets)
+    }
+
+    addProposta(sockets, user, value) {
+        this.giocatoreSelezionato.addProposta(user, value)
+        this.getSoccerPlayerStatus(sockets)
     }
 }
 

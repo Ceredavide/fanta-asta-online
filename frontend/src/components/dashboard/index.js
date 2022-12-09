@@ -13,13 +13,7 @@ function Dashboard({ socket }) {
     };
 
     const astaListener = (data) => {
-      const { proposte } = data
-      if (proposte.length !== 0) {
-        const highestProposta = proposte.splice(0, 1)[0]
-        setAstaState({ ...data, highestProposta: highestProposta, proposte })
-      } else {
         setAstaState(data)
-      }
     };
 
     socket.emit('get-active-users')
@@ -37,10 +31,12 @@ function Dashboard({ socket }) {
     socket.emit("active-asta")
   }
 
+  console.log(astaState)
+
   return (
     <div className="message-list">
-      <div class="fs-4">Utenti Attivi:
-        {activeUsers.map((activeUser) => <div key={activeUser} class="badge bg-success text-wrap m-1">
+      <div className="fs-4">Utenti Attivi:
+        {activeUsers.map((activeUser) => <div key={activeUser} className="badge bg-success text-wrap m-1">
           {activeUser}
         </div>)}
       </div>

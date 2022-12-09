@@ -16,17 +16,21 @@ class Connection {
     socket.on("get-active-users", () => {
       auth.sendActiveUsers(this.io.sockets)
     });
-
+    
     socket.on('get-asta-status', () => {
       asta.getAstaStatus(this.io.sockets)
+    });
+
+    socket.on("get-soccer-player-status", () => {
+      asta.getSoccerPlayerStatus(this.io.sockets)
     });
 
     socket.on("active-asta", () => {
       asta.activeAsta(this.io.sockets)
     });
 
-    socket.on("select-giocatore", (giocatore) => {
-      asta.selectGiocatore(this.io.sockets, giocatore)
+    socket.on("select-giocatore", (giocatoreId) => {
+      asta.selectGiocatore(this.io.sockets, giocatoreId)
     })
 
     socket.on("leave-giocatore",() => {
@@ -34,16 +38,12 @@ class Connection {
       asta.leaveGiocatore(this.io.sockets, user)
     })
 
-    socket.on("send-proposta", (value) => {
+    socket.on("add-proposta", (value) => {
       const user = auth.getUser(this.socket.id)
-      asta.sendProposta(this.io.sockets, user, value)
+      asta.addProposta(this.io.sockets, user, value)
     })
 
     socket.on('disconnect', () => this.disconnect());
-    
-    //   socket.on('connect_error', (err) => {
-    //     console.log(`connect_error due to ${err.message}`);
-    //   });
   }
 
   disconnect() {
@@ -51,10 +51,10 @@ class Connection {
   }
 }
 
-function chat(io) {
+function connection(io) {
   io.on('connection', (socket) => {
     new Connection(io, socket);
   });
 };
 
-module.exports = chat;
+module.exports = connection;

@@ -1,31 +1,33 @@
 function ProposteView({ proposte, highestProposta }) {
-    if (proposte.length !== 0) return (
+    if (!!highestProposta) return (
         <div className="row">
             <div className="text-center">
                 Offerta piu alta: <h2>{highestProposta.value}</h2> {highestProposta.user}
             </div>
-            <div>
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome:</th>
-                            <th scope="col">Valore:</th>
-                            <th scope="col">Orario:</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {proposte.map((proposta, index) => (
-                            <tr key={proposta.timestamp}>
-                                <th scope="row">{proposte.length-index}</th>
-                                <td>{proposta.user}</td>
-                                <td>{proposta.value}</td>
-                                <td>{proposta.timestamp}</td>
+            {proposte.length != 0 &&
+                <div>
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome:</th>
+                                <th scope="col">Valore:</th>
+                                <th scope="col">Orario:</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {proposte.map((proposta, index, proposte) => (
+                                <tr key={proposta.timestamp}>
+                                    <th scope="row">{proposte.length - index}</th>
+                                    <td>{proposta.user}</td>
+                                    <td>{proposta.value}</td>
+                                    <td>{new Date(proposta.timestamp).toISOString().slice(11, 19)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
     )
 }

@@ -22,15 +22,17 @@ function App() {
   }
   else {
     return (
-      <div className="App">
-        <header className="app-header">
-          React Chat {user ? `${user.nome}` : ""}
+      <div className="container text-center">
+        <header className="app-header mt-3 mb-5">
+          Asta Fantacalcio {user ? `${user.nome}` : ""}
         </header>
-        {user ? user.nome === "Admin" ? <Dashboard socket={socket} /> : (
-          <Asta socket={socket} user={user} setUser={setUser} />
-        ) : (
-          <AuthInput socket={socket} setUser={setUser} />
-        )}
+        <div >
+          {user ? user.nome === "Admin" ? <Dashboard socket={socket} /> : (
+            <Asta socket={socket} user={user} setUser={setUser} />
+          ) : (
+            <AuthInput socket={socket} setUser={setUser} />
+          )}
+        </div>
       </div>
     );
   }

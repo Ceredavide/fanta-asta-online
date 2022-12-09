@@ -2,53 +2,59 @@ import React, { useEffect, useState } from 'react';
 
 import ProposteView from '../ProposteView';
 
-function Asta({ socket, user, setUser }) {
+function Asta({ socket, user }) {
 
-    const [astaState, setAstaState] = useState({});
+    const [astaState, setAstaState] = useState(null);
+    const [currentSoccerPlayerState, setcurrentSoccerPlayerState] = useState(null)
     const [valueProposta, setValueProposta] = useState('');
 
     useEffect(() => {
         const astaListener = (data) => {
-            const { proposte } = data
-            if (proposte.length !== 0) {
-                const highestProposta = proposte.splice(0, 1)[0]
-                setAstaState({ ...data, highestProposta: highestProposta, proposte })
-            } else {
-                setAstaState(data)
-            }
+            setAstaState(data)
         };
 
-        socket.on('update-asta-status', astaListener);
-        // socket.on('deleteMessage', deleteMessageListener);
+        const currentSoccerPlayerListener = (data) => {
+            const newArr = [...data.proposte].reverse()
+            setcurrentSoccerPlayerState({...data, proposte: newArr})
+        }
+
         socket.emit('get-asta-status');
+        socket.emit("get-soccer-player-status")
+        socket.on('update-asta-status', astaListener);
+        socket.on('update-soccer-player-status', currentSoccerPlayerListener);
+        
 
         return () => {
             socket.off('update-asta-status', astaListener);
         };
     }, [socket]);
 
-    function selectGiocatore(giocatore) {
-        socket.emit("select-giocatore", giocatore)
+    function selectGiocatore(giocatoreId) {
+        socket.emit("select-giocatore", giocatoreId)
     }
 
-    function submitForm(e) {
+    function leaveGiocatore() {
+        socket.emit("leave-giocatore")
+    }
+
+    function sendProposta(e) {
         e.preventDefault();
-        if (valueProposta > astaState.highestProposta.value) {
-            socket.emit('send-proposta', valueProposta);
+        if (!astaState.highestProposta || valueProposta > currentSoccerPlayerState.highestProposta.value) {
+            socket.emit('add-proposta', valueProposta);
         } else {
             alert("offerta troppo bassa mate")
         }
         setValueProposta('');
     }
 
-    if (astaState.isAstaOn) {
-        if (astaState.giocatoreSelezionato === null) {
+    if (astaState?.isAstaOn) {
+        if (!currentSoccerPlayerState || currentSoccerPlayerState.selectedSoccerPlayer === null) {
             return (
                 <div>
                     {astaState.currentUser === user.nome ? <>
                         <div>Tocca a te scegliere il giocatore!</div>
                         <div>
-                            {astaState.listone[astaState.categoriaGiocatori].map(giocatore => <button key={giocatore.Id} onClick={() => selectGiocatore(giocatore)}>{giocatore.Nome}</button>)}
+                            {astaState.listone.map(giocatore => <button key={giocatore.Id} onClick={() => selectGiocatore(giocatore.Id)}>{giocatore.Nome}</button>)}
                         </div>
                     </> : `${astaState.currentUser} deve scegliere un giocatore`}
                 </div>
@@ -56,18 +62,23 @@ function Asta({ socket, user, setUser }) {
         } else {
             return (
                 <div>
-                    Quanti soldi vuoi mettere per {astaState.giocatoreSelezionato.Nome}?
-                    <ProposteView proposte={astaState.proposte} highestProposta={astaState.highestProposta} />
-                    <form onSubmit={submitForm}>
-                        <input
-                            value={valueProposta}
-                            placeholder="Buttali sti cash"
-                            onChange={(e) => {
-                                setValueProposta(e.currentTarget.value);
-                            }}
-                        />
-                        <button type='submit'>Manda Proposta</button>
-                    </form>
+                    <ProposteView proposte={currentSoccerPlayerState.proposte} highestProposta={currentSoccerPlayerState.highestProposta} />
+                    {currentSoccerPlayerState?.usersOut.includes(astaState.currentUser) === false &&
+                        <div>
+                            Quanti soldi vuoi mettere per {currentSoccerPlayerState.selectedSoccerPlayer.Nome}?
+                            <form onSubmit={sendProposta}>
+                                <input
+                                    value={valueProposta}
+                                    placeholder="Buttali sti cash"
+                                    onChange={(e) => {
+                                        setValueProposta(e.currentTarget.value);
+                                    }}
+                                />
+                                <button type='submit'>Manda Proposta</button>
+                            </form>
+                            <button type='button' onClick={leaveGiocatore}>Lascia Giocatore</button>
+                        </div>
+                    }
                 </div>
             )
         }
